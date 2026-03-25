@@ -21,6 +21,24 @@ def _list_outputs() -> set[str]:
     return {str(f.relative_to(output_dir)) for f in output_dir.rglob("*.md")}
 
 
+def _generate_title(message: str, max_len: int = 40) -> str:
+    """Generate a short title from the first user message."""
+    import re
+    # Remove URLs
+    text = re.sub(r'https?://\S+', '', message).strip()
+    # Remove excess whitespace
+    text = re.sub(r'\s+', ' ', text).strip()
+    if not text:
+        text = message[:max_len]
+    # Truncate at word boundary
+    if len(text) > max_len:
+        text = text[:max_len].rsplit(' ', 1)[0]
+        if not text:
+            text = message[:max_len]
+        text += '...'
+    return text
+
+
 @router.websocket("/ws/{session_id}")
 async def websocket_endpoint(ws: WebSocket, session_id: str):
     await ws.accept()
@@ -69,7 +87,16 @@ async def websocket_endpoint(ws: WebSocket, session_id: str):
 
             # Refresh session to get claude_session_id
             session = await session_store.get_session(session_id)
-            is_first_turn = session.claude_session_id is None
+
+            # Auto-generate title from first user message
+            if is_first_turn := session.claude_session_id is None:
+                title = _generate_title(incoming.content)
+                await session_store.update_session(session_id, title=title)
+                session = await session_store.get_session(session_id)
+                await ws.send_json({
+                    "type": "title_updated",
+                    "title": title,
+                })
 
             runner = ClaudeRunner(
                 skill_name=session.skill_name or "",

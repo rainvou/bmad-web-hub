@@ -6,6 +6,7 @@ class SkillMeta(BaseModel):
     name: str
     display_name: str = ""
     description: str = ""
+    description_ko: str = ""
     type: str = "skill"  # skill or agent
     icon: str = ""
     module: str = "core"

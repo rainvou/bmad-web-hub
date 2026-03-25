@@ -2,6 +2,7 @@ export interface SkillMeta {
   name: string;
   display_name: string;
   description: string;
+  description_ko: string;
   type: 'skill' | 'agent';
   icon: string;
   module: string;
@@ -73,6 +74,11 @@ export interface WSToolUse {
   tool: string;
 }
 
+export interface WSTitleUpdated {
+  type: 'title_updated';
+  title: string;
+}
+
 export type WSIncoming =
   | WSSessionInit
   | WSAssistantStart
@@ -80,4 +86,5 @@ export type WSIncoming =
   | WSAssistantEnd
   | WSError
   | WSOutputDetected
-  | WSToolUse;
+  | WSToolUse
+  | WSTitleUpdated;

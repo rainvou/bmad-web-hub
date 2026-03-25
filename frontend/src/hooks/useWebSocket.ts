@@ -84,6 +84,10 @@ export function useWebSocket(sessionId: string | undefined): UseWebSocketReturn 
             setActiveTool(data.tool);
             break;
 
+          case 'title_updated':
+            setSession((prev) => prev ? { ...prev, title: data.title } : prev);
+            break;
+
           case 'error':
             setIsStreaming(false);
             setActiveTool(null);

@@ -7,15 +7,18 @@ export function useSessions() {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(() => {
-    setLoading(true);
     api.sessions
       .list()
       .then(setSessions)
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
     refresh();
+    // Poll every 5s to pick up title updates from other tabs/sessions
+    const interval = setInterval(refresh, 5000);
+    return () => clearInterval(interval);
   }, [refresh]);
 
   const deleteSession = useCallback(
