@@ -8,6 +8,11 @@ class Settings(BaseSettings):
     OUTPUT_DIR: Path = Path("")
     CLAUDE_BIN: Path = Path("/home/axz/.local/bin/claude")
     DB_PATH: Path = Path("")
+    ANTHROPIC_API_KEY: str = ""
+    ANTHROPIC_BASE_URL: str = "https://api.bizrouter.ai"
+    CLAUDE_MODEL: str = "claude-sonnet-4-5-20250929"
+
+    model_config = {"env_file": Path(__file__).resolve().parent.parent / ".env"}
 
     def model_post_init(self, __context) -> None:
         if self.SKILLS_DIR == Path(""):
